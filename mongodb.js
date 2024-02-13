@@ -14,41 +14,41 @@ MongoClient.connect(
     if (error) {
       return console.log("Unable to connect to database!");
     }
-
-    console.log("Connected correctly!");
-
     const db = client.db(databaseName);
 
-    // db.collection("users").insertOne(
-    //   {
-    //     _id: id,
-    //     name: "Clayton",
-    //     age: 21,
-    //   },
+    db.collection("tasks").findOne(
+      { _id: new ObjectId("65caea869508f43b7a9081a6") },
+      (error, result) => {
+        console.log("Last task: ", result);
+      }
+    );
+
+    db.collection("tasks")
+      .find({ complete: false })
+      .toArray((error, result) => {
+        console.log(result);
+      });
+
+    // db.collection("tasks").insertMany([
+    //   { description: "Walk", complete: false },
+    //   { description: "Jog", complete: false },
+    //   { description: "Sprint", complete: false },
+    // ]);
+
+    // db.collection("users").findOne(
+    //   { _id: new ObjectId("65ca5d546591516985494555") },
     //   (error, result) => {
     //     if (error) {
-    //       return console.log("Unable to insert user to collection users");
+    //       return console.log(`Can't find ${this.name} in users table!`);
     //     }
-
-    //     console.log("Inserted ID: " + result.insertedId);
+    //     console.log(result);
     //   }
     // );
 
-    // db.collection("users").insertMany([
-    //   {
-    //     name: "Bill",
-    //     age: 32,
-    //   },
-    //   {
-    //     name: "Coco",
-    //     age: 4,
-    //   },
-    // ]);
-
-    // db.collection("tasks").insertMany([
-    //   { description: "Code", complete: false },
-    //   { description: "Read", complete: true },
-    //   { description: "Be Mindful", complete: false },
-    // ]);
+    // db.collection("users")
+    //   .find({ age: 29 })
+    //   .toArray((error, result) => {
+    //     console.log(result);
+    //   });
   }
 );
