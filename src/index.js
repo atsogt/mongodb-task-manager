@@ -1,15 +1,10 @@
 const express = require("express");
-const mongoose = require("mongoose");
+require("./db/mongoose");
 const User = require("./models/user");
 const Task = require("./models/task");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-mongoose
-  .connect("mongodb://127.0.0.1:27017/task-manager-api")
-  .then(() => console.log("connected"))
-  .catch((error) => console.log("ERROR: ", error));
 
 app.use(express.json());
 
