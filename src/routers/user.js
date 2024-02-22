@@ -37,6 +37,7 @@ router.post("/users", async (req, res) => {
 });
 
 router.patch("/users/:id", async (req, res) => {
+  //grabs keys
   const updates = Object.keys(req.body);
   const allowedUpdates = ["name", "email", "age", "password"];
   const isValidUpdate = updates.every((update) =>
@@ -48,13 +49,20 @@ router.patch("/users/:id", async (req, res) => {
   }
 
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      runValidators: true,
-      new: true,
-    });
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).send();
     }
+    //dynamic update
+    updates.forEach((update) => {
+      user[update] = req.body[update];
+    });
+
+    user.save();
+    // const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    //   runValidators: true,
+    //   new: true,
+    // });
 
     res.status(200).send(user);
   } catch (error) {
