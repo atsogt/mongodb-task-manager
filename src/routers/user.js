@@ -1,14 +1,11 @@
 const express = require("express");
 const router = new express.Router();
 const User = require("../models/user");
+const auth = require("../middleware/auth"); // for sign up and login
 
-router.get("/users", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.status(200).send(users);
-  } catch (error) {
-    res.status(500).send(error);
-  }
+router.get("/users/me", auth, async (req, res) => {
+  console.log("Route handler");
+  res.send(req.user);
 });
 
 router.get("/users/:id", async (req, res) => {
@@ -27,10 +24,26 @@ router.get("/users/:id", async (req, res) => {
 router.post("/users", async (req, res) => {
   try {
     const user = await new User(req.body).save();
+    const token = await user.generateAuthToken();
     if (!user) {
       return res.status(404).send();
     }
-    res.send(user);
+    res.status(201).send({ user, token });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+router.post("/users/login", async (req, res) => {
+  try {
+    const user = await User.findByCredentials(
+      req.body.email,
+      req.body.password
+    );
+    const token = await user.generateAuthToken();
+    console.log(user, token);
+    // res.status(200).send(user);
+    res.send({ user, token });
   } catch (error) {
     res.status(400).send(error);
   }
@@ -59,10 +72,6 @@ router.patch("/users/:id", async (req, res) => {
     });
 
     user.save();
-    // const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-    //   runValidators: true,
-    //   new: true,
-    // });
 
     res.status(200).send(user);
   } catch (error) {
