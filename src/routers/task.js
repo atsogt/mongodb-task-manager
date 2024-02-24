@@ -1,21 +1,25 @@
 const express = require("express");
 const router = new express.Router();
 const Task = require("../models/task");
+const auth = require("../middleware/auth");
 
-router.get("/tasks", async (req, res) => {
+router.get("/tasks", auth, async (req, res) => {
   try {
-    const tasks = await Task.find({});
-    res.send(tasks);
+    // const tasks = await Task.find({ owner: req.user._id });
+    await req.user.populate("tasks");
+    res.send(req.user.tasks);
   } catch (error) {
     res.status(500).send(e);
   }
 });
 
-router.get("/tasks/:id", async (req, res) => {
+router.get("/tasks/:id", auth, async (req, res) => {
   const _id = req.params.id;
+  // console.log(_id);
   try {
-    const task = await Task.findById(_id);
-
+    console.log("owner", req.user._id);
+    const task = await Task.findOne({ _id, owner: req.user._id });
+    console.log(task);
     if (!task) {
       return res.status(404).send();
     }
@@ -26,25 +30,18 @@ router.get("/tasks/:id", async (req, res) => {
   }
 });
 
-router.post("/tasks", async (req, res) => {
-  console.log("Request.Body: ", req.body);
+router.post("/tasks", auth, async (req, res) => {
   try {
-    if (req.body.description && req.body.completed) {
-      const task = new Task(req.body);
-      console.log("Task added: ", task);
-      await task.save();
-      res.status(201).send(task);
-    } else {
-      res.status(400).send({
-        error: "Not valid body. Description and completed are required",
-      });
-    }
+    const task = new Task({ ...req.body, owner: req.user._id });
+    // console.log("Owner ID: ", req.user._id);
+    await task.save();
+    res.status(201).send(task);
   } catch (e) {
     res.status(500).send({ error: "Internal Server Error" });
   }
 });
 
-router.patch("/tasks/:id", async (req, res) => {
+router.patch("/tasks/:id", auth, async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ["description", "completed"];
   const isUpdate = updates.every((update) => allowedUpdates.includes(update));
@@ -55,8 +52,10 @@ router.patch("/tasks/:id", async (req, res) => {
   const _id = req.params.id;
 
   try {
-    const task = await Task.findById(_id);
-    console.log(task);
+    const task = await Task.findOne({
+      _id: req.params.id,
+      owner: req.user._id,
+    });
 
     if (!task) {
       return res.status(404).send({ message: "Task not found" });

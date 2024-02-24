@@ -2,6 +2,7 @@ const express = require("express");
 require("./db/mongoose");
 const jwt = require("jsonwebtoken");
 const Task = require("./models/task");
+const User = require("./models/user");
 const userRouter = require("./routers/user");
 const taskRouter = require("./routers/task");
 
@@ -37,3 +38,16 @@ app.use(taskRouter);
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
+
+// const main = async () => {
+//   const task = await Task.findById("65d94d13710dd4b866763967");
+//   // await task.populate("");
+//   // await task.populate("owner");
+//   // console.log(task);
+
+//   const user = await User.findById("65d768e328f8330be8fa2fbf");
+//   await user.populate("tasks");
+//   // console.log(user.tasks);
+// };
+
+// main();
