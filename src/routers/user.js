@@ -106,22 +106,12 @@ router.patch("/users/me", auth, async (req, res) => {
 });
 
 router.delete("/users/me", auth, async (req, res) => {
-  // res.send("hit");
   try {
     await req.user.deleteOne({ _id: req.user._id });
     res.send(req.user);
   } catch (error) {
     res.status(500).send(error);
   }
-  // try {
-  //   const user = await User.findByIdAndDelete(req.params.id);
-  //   if (!user) {
-  //     res.status(404).send({ Message: "User not found!" });
-  //   }
-  //   res.status(200).send(user);
-  // } catch (error) {
-  //   res.status(500).send(error);
-  // }
 });
 
 module.exports = router;
