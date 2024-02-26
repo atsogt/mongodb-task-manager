@@ -5,6 +5,7 @@ const Task = require("./models/task");
 const User = require("./models/user");
 const userRouter = require("./routers/user");
 const taskRouter = require("./routers/task");
+const songRouter = require("./routers/song");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,6 +25,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(userRouter);
 app.use(taskRouter);
+app.use(songRouter);
 
 // const myFunction = () => {
 //   const token = jwt.sign({ _id: "abc123" }, "mytokenSignature"); //secret signature
