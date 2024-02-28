@@ -4,6 +4,7 @@ const User = require("../models/user");
 const sharp = require("sharp");
 const auth = require("../middleware/auth"); // for sign up and login
 const multer = require("multer");
+const { sendWelcomeEmail, sendCancelationEmail } = require("../emails/account");
 
 const upload = multer({
   limits: {
@@ -18,7 +19,6 @@ const upload = multer({
 });
 
 router.get("/users/me", auth, async (req, res) => {
-  // console.log("Route handler");
   res.send(req.user);
 });
 
@@ -36,15 +36,14 @@ router.get("/users/:id", async (req, res) => {
 });
 
 router.post("/users", async (req, res) => {
+  const user = await new User(req.body);
   try {
-    const user = await new User(req.body).save();
+    await user.save();
+    sendWelcomeEmail(user.email, user.name);
     const token = await user.generateAuthToken();
-    if (!user) {
-      return res.status(404).send();
-    }
     res.status(201).send({ user, token });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send("Not able to post user nor send email");
   }
 });
 //url, middleware, route handler
@@ -56,8 +55,6 @@ router.post("/users/login", async (req, res) => {
       req.body.password
     );
     const token = await user.generateAuthToken();
-    // console.log(user, token);
-    // res.status(200).send(user);
     res.send({ user, token });
   } catch (error) {
     res.status(400).send(error);
@@ -120,9 +117,11 @@ router.patch("/users/me", auth, async (req, res) => {
 });
 
 router.delete("/users/me", auth, async (req, res) => {
+  const user = req.user;
   try {
-    await req.user.deleteOne({ _id: req.user._id });
-    res.send(req.user);
+    sendCancelationEmail(user.email, user.name);
+    await req.user.deleteOne({ _id: user._id });
+    res.send();
   } catch (error) {
     res.status(500).send(error);
   }
@@ -151,7 +150,7 @@ router.delete(
   auth,
   async (req, res) => {
     req.user.avatar = undefined;
-    await req.user.save();
+    await req.user.remove();
     res.send("Deleted profile avatar");
   },
   (error, req, res, next) => {

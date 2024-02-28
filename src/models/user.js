@@ -82,8 +82,6 @@ userSchema.methods.generateAuthToken = async function () {
 };
 
 userSchema.statics.findByCredentials = async (email, password) => {
-  // console.log("Result", { email, password });
-
   const user = await User.findOne({ email });
   console.log(user);
   if (!user) {
@@ -111,7 +109,6 @@ userSchema.virtual("songs", {
 
 userSchema.pre("save", async function (next) {
   const user = this;
-  console.log("just before saving!");
   //mongoose functionality
   if (user.isModified("password")) {
     user.password = await bcrypt.hash(user.password, 8);
