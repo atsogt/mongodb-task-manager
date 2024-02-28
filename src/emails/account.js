@@ -1,26 +1,34 @@
-require("dotenv").config();
 const nodemailer = require("nodemailer");
+let config = {
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD,
+  },
+};
+const transporter = nodemailer.createTransport(config);
 
-console.log(process.env.EMAIL);
-console.log(process.env.PASSWORD);
-// const transporter = nodemailer.createTransport({
-//   port: 465,
-//   secure: true,
-//   auth: {
-//     // TODO: replace `user` and `pass` values from <https://forwardemail.net>
-//     user: process.env.EMAIL,
-//     pass: process.env.PASSWORD,
-//   },
-// });
+let sendWelcomeEmail = async (email, name) => {
+  let message = {
+    subject: "Thank you for signing up!", // Subject line
+    from: EMAIL, // sender address
+    to: email, // list of receivers
+    text: `Welcome to the app, ${name}! Hope you enjoy your own personal task app.`, // html body
+  };
 
-// const sendEmail = async () => {
-//   const info = await transporter.sendMail({
-//     from: process.env.EMAIL, // sender address
-//     to: "atsogt24@gmail.com", // list of receivers
-//     subject: "Hello ✔", // Subject line
-//     text: "Hello world?", // plain text body
-//     html: "<b>Hello world?</b>", // html body
-//   });
-// };
+  await transporter.sendMail(message);
+};
 
-// sendEmail();
+let sendCancelationEmail = async (email, name) => {
+  let message = {
+    subject: "You're account is cancelled!", // Subject line
+    from: EMAIL, // sender address
+    to: email, // list of receivers
+    text: `We're sorry to see you go, ${name}! Please tell use why you cancelled your account.`, // html body
+  };
+  await transporter.sendMail(message);
+};
+
+module.exports = { sendWelcomeEmail, sendCancelationEmail };
