@@ -1,20 +1,24 @@
 const express = require("express");
-const router = new express.Router();
 const Task = require("../models/task");
 const auth = require("../middleware/auth");
-const email = require("../emails/account");
+const router = new express.Router();
 
-//
-//
-//GET /tasks?sortBy=createdAt: desc
+router.post("/tasks", auth, async (req, res) => {
+  const task = new Task({ ...req.body, owner: req.user._id });
+
+  try {
+    await task.save();
+    res.status(201).send(task);
+  } catch (e) {
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+});
+
 router.get("/tasks", auth, async (req, res) => {
   const match = {};
   const sort = {};
 
   if (req.query.completed) {
-    // we are turning it into a Boolean
-    // if req.query.completed is not matching to true
-    // it will become false
     match.completed = req.query.completed === "true";
   }
   if (req.query.sortBy) {
@@ -29,7 +33,7 @@ router.get("/tasks", auth, async (req, res) => {
       options: {
         skip: parseInt(req.query.skip),
         limit: parseInt(req.query.limit),
-        sort: sort,
+        sort,
       },
     });
     res.send(req.user.tasks);
@@ -40,11 +44,9 @@ router.get("/tasks", auth, async (req, res) => {
 
 router.get("/tasks/:id", auth, async (req, res) => {
   const _id = req.params.id;
-  // console.log(_id);
   try {
-    console.log("owner", req.user._id);
     const task = await Task.findOne({ _id, owner: req.user._id });
-    console.log(task);
+
     if (!task) {
       return res.status(404).send();
     }
@@ -52,17 +54,6 @@ router.get("/tasks/:id", auth, async (req, res) => {
     res.status(200).send(task);
   } catch (error) {
     res.status(500).send(error);
-  }
-});
-
-router.post("/tasks", auth, async (req, res) => {
-  try {
-    const task = new Task({ ...req.body, owner: req.user._id });
-    // console.log("Owner ID: ", req.user._id);
-    await task.save();
-    res.status(201).send(task);
-  } catch (e) {
-    res.status(500).send({ error: "Internal Server Error" });
   }
 });
 
@@ -74,7 +65,6 @@ router.patch("/tasks/:id", auth, async (req, res) => {
   if (!isUpdate) {
     return res.status(406).send({ updateMessage: "Task update not allowed." });
   }
-  const _id = req.params.id;
 
   try {
     const task = await Task.findOne({

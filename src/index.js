@@ -9,12 +9,12 @@ const songRouter = require("./routers/song");
 const app = express();
 app.use(cors());
 app.use(express.json());
-const PORT = process.env.PORT;
+const port = process.env.PORT;
 
 app.use(userRouter);
 app.use(taskRouter);
 app.use(songRouter);
 
-app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
 });
