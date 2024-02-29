@@ -6,9 +6,10 @@ const taskRouter = require("./routers/task");
 const songRouter = require("./routers/song");
 
 const app = express();
+app.use(cors());
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
 app.use(userRouter);
 app.use(taskRouter);
 app.use(songRouter);
