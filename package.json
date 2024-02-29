@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "21.6.2"
+  },
   "scripts": {
     "start": "node src/index",
     "dev": "nodemon src/index.js"
