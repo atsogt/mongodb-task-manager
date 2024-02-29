@@ -1,6 +1,7 @@
 const express = require("express");
 require("./db/mongoose");
-require("dotenv");
+require("dotenv").config();
+const cors = require("cors");
 const userRouter = require("./routers/user");
 const taskRouter = require("./routers/task");
 const songRouter = require("./routers/song");
