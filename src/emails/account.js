@@ -15,7 +15,7 @@ let sendWelcomeEmail = async (email, name) => {
     subject: "Thank you for signing up!", // Subject line
     from: process.env.EMAIL, // sender address
     to: email, // list of receivers
-    text: `Welcome to the app, ${name}! Hope you enjoy your own personal task app.`, // html body
+    text: `Welcome to the app, ${name}! Hope you enjoy your own personal task app.`,
   };
 
   await transporter.sendMail(message);
