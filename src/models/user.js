@@ -83,7 +83,7 @@ userSchema.methods.generateAuthToken = async function () {
 
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email });
-  console.log(user);
+  console.log("findByCredentials", user);
   if (!user) {
     throw new Error("User Not Found");
   }
@@ -95,17 +95,17 @@ userSchema.statics.findByCredentials = async (email, password) => {
   return user;
 };
 
-userSchema.virtual("tasks", {
-  ref: "Task",
-  localField: "_id",
-  foreignField: "owner",
-});
+// userSchema.virtual("tasks", {
+//   ref: "Task",
+//   localField: "_id",
+//   foreignField: "owner",
+// });
 
-userSchema.virtual("songs", {
-  ref: "Song",
-  localField: "_id",
-  foreignField: "owner",
-});
+// userSchema.virtual("songs", {
+//   ref: "Song",
+//   localField: "_id",
+//   foreignField: "owner",
+// });
 
 userSchema.pre("save", async function (next) {
   const user = this;
